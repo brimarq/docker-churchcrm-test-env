@@ -24,7 +24,7 @@ services:
       MYSQL_USER: ${MYSQL_USER:-churchcrm}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-churchcrm}
     volumes:
-      - mysqldata:/var/lib/mysql
+      - ./database:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin
@@ -37,6 +37,3 @@ services:
     restart: always
     ports:
       - 8085:80
-
-volumes:
-  mysqldata:
