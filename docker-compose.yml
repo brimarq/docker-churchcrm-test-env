@@ -1,0 +1,42 @@
+services:
+  apache:
+    build: ./docker/apache
+    links:
+      - php
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/usr/local/apache2/htdocs
+
+  php:
+    build: ./docker/${PHP_VERSION:-php74}
+    volumes:
+      - ./src:/usr/local/apache2/htdocs
+    working_dir: /usr/local/apache2/htdocs
+
+  mysql:
+    image: mysql:8.0.28
+    cap_add:
+      - SYS_NICE # CAP_SYS_NICE workaround for "mbind: Operation not permitted" log warning
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-toor}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-churchcrm}
+      MYSQL_USER: ${MYSQL_USER:-churchcrm}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-churchcrm}
+    volumes:
+      - mysqldata:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8085:80
+
+volumes:
+  mysqldata:
